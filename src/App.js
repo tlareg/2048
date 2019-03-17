@@ -25,18 +25,23 @@ const Tile = ({ val }) => {
   return <div className="tile">{tileValToStr(val)}</div>;
 };
 
+const renderTiles = tiles =>
+  Array(BOARD_SIZE)
+    .fill()
+    .map((_v, y) => (
+      <div className="row">
+        {Array(BOARD_SIZE)
+          .fill()
+          .map((_v, x) => (
+            <Tile val={tiles[tileKey(x, y)]} />
+          ))}
+      </div>
+    ));
+
 const Board = () => {
   let tiles = initTiles(BOARD_SIZE);
-
   tiles = setVal({ tiles, x: 1, y: 1, val: 1024 });
-
-  return (
-    <div className="board">
-      {Object.values(tiles).map(val => (
-        <Tile val={val} />
-      ))}
-    </div>
-  );
+  return <div className="board">{renderTiles(tiles)}</div>;
 };
 
 const App = () => {

@@ -22,8 +22,13 @@ code {
 }
 
 .board {
-  display: grid;
-  grid-template-columns: repeat(4, auto);
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
 }
 
 .tile {
