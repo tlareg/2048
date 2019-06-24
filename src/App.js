@@ -41,6 +41,8 @@ const moveTiles = ({ direction, tiles, size }) => {
             newTiles[tileKey(x, y - 1)] === EMPTY_TILE_VALUE &&
             tiles[tileKey(x, y)] !== EMPTY_TILE_VALUE
           ) {
+            // todo: przesowac go dopoki nie ma przed sobą sciany lub innego klocka
+            // todo: dodac jesli ma przed sobą innego klocka
             newTiles[tileKey(x, y - 1)] = tiles[tileKey(x, y)];
             newTiles[tileKey(x, y)] = EMPTY_TILE_VALUE;
           }
