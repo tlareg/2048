@@ -30,31 +30,54 @@ const initTiles = size => {
   return tiles;
 };
 
-const moveTiles = ({ direction, tiles, size }) => {
-  const newTiles = { ...tiles };
+const moveTileIfNeeded = ({ newTiles, x, y, getAheadXY }) => {
+  let currentTileKey = tileKey(x, y);
+  let { x: aheadX, y: aheadY } = getAheadXY(x, y);
+  let aheadTileKey = tileKey(aheadX, aheadY);
 
-  let currentTileKey;
-  let aheadTileKey;
+  if (newTiles[currentTileKey] === EMPTY) return newTiles;
+
+  // move until it has wall or other not empty tile ahead
+  while (newTiles[aheadTileKey] && newTiles[aheadTileKey] === EMPTY) {
+    newTiles = {
+      ...newTiles,
+      [aheadTileKey]: newTiles[currentTileKey],
+      [currentTileKey]: EMPTY
+    };
+
+    currentTileKey = aheadTileKey;
+    const newAheadCoords = getAheadXY(aheadX, aheadY);
+    aheadX = newAheadCoords.x;
+    aheadY = newAheadCoords.y;
+    aheadTileKey = tileKey(aheadX, aheadY);
+  }
+
+  // sum tiles
+  if (newTiles[currentTileKey] === newTiles[aheadTileKey]) {
+    return {
+      ...newTiles,
+      [aheadTileKey]: newTiles[currentTileKey] + newTiles[aheadTileKey],
+      [currentTileKey]: EMPTY
+    };
+  }
+
+  return newTiles;
+};
+
+const moveTiles = ({ direction, tiles, size }) => {
+  let newTiles = { ...tiles };
 
   if (direction === DIRECTIONS.UP) {
-    // loop all tiles
     for (let x = 0; x < size; x++) {
       for (let y = 0; y < size; y++) {
-        if (y - 1 >= 0) {
-          currentTileKey = tileKey(x, y);
-          aheadTileKey = tileKey(x, y - 1);
+        if (y - 1 < 0) continue;
 
-          if (tiles[currentTileKey] === EMPTY) {
-            continue;
-          }
-
-          if (newTiles[aheadTileKey] === EMPTY) {
-            // todo: przesowac go dopoki nie ma przed sobą sciany lub innego klocka
-            // todo: dodac jesli ma przed sobą innego klocka
-            newTiles[aheadTileKey] = tiles[currentTileKey];
-            newTiles[currentTileKey] = EMPTY;
-          }
-        }
+        newTiles = moveTileIfNeeded({
+          newTiles,
+          x,
+          y,
+          getAheadXY: (x, y) => ({ x, y: y - 1 })
+        });
       }
     }
     return newTiles;
@@ -63,15 +86,14 @@ const moveTiles = ({ direction, tiles, size }) => {
   if (direction === DIRECTIONS.DOWN) {
     for (let x = 0; x < size; x++) {
       for (let y = size - 1; y >= 0; y--) {
-        if (y + 1 <= size - 1) {
-          if (
-            newTiles[tileKey(x, y + 1)] === EMPTY &&
-            tiles[tileKey(x, y)] !== EMPTY
-          ) {
-            newTiles[tileKey(x, y + 1)] = tiles[tileKey(x, y)];
-            newTiles[tileKey(x, y)] = EMPTY;
-          }
-        }
+        if (y + 1 > size - 1) continue;
+
+        newTiles = moveTileIfNeeded({
+          newTiles,
+          x,
+          y,
+          getAheadXY: (x, y) => ({ x, y: y + 1 })
+        });
       }
     }
     return newTiles;
@@ -80,15 +102,14 @@ const moveTiles = ({ direction, tiles, size }) => {
   if (direction === DIRECTIONS.RIGHT) {
     for (let x = size - 1; x >= 0; x--) {
       for (let y = 0; y < size; y++) {
-        if (x + 1 <= size - 1) {
-          if (
-            newTiles[tileKey(x + 1, y)] === EMPTY &&
-            tiles[tileKey(x, y)] !== EMPTY
-          ) {
-            newTiles[tileKey(x + 1, y)] = tiles[tileKey(x, y)];
-            newTiles[tileKey(x, y)] = EMPTY;
-          }
-        }
+        if (x + 1 > size - 1) continue;
+
+        newTiles = moveTileIfNeeded({
+          newTiles,
+          x,
+          y,
+          getAheadXY: (x, y) => ({ x: x + 1, y })
+        });
       }
     }
     return newTiles;
@@ -97,15 +118,14 @@ const moveTiles = ({ direction, tiles, size }) => {
   if (direction === DIRECTIONS.LEFT) {
     for (let x = 0; x < size; x++) {
       for (let y = 0; y < size; y++) {
-        if (x - 1 >= 0) {
-          if (
-            newTiles[tileKey(x - 1, y)] === EMPTY &&
-            tiles[tileKey(x, y)] !== EMPTY
-          ) {
-            newTiles[tileKey(x - 1, y)] = tiles[tileKey(x, y)];
-            newTiles[tileKey(x, y)] = EMPTY;
-          }
-        }
+        if (x - 1 < 0) continue;
+
+        newTiles = moveTileIfNeeded({
+          newTiles,
+          x,
+          y,
+          getAheadXY: (x, y) => ({ x: x - 1, y })
+        });
       }
     }
     return newTiles;
