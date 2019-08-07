@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 const BOARD_SIZE = 4;
-const EMPTY_TILE_VALUE = "EMPTY";
+const EMPTY = "EMPTY";
 const DIRECTIONS = {
   UP: "up",
   DOWN: "down",
@@ -24,7 +24,7 @@ const initTiles = size => {
   const tiles = {};
   for (let x = 0; x < size; x++) {
     for (let y = 0; y < size; y++) {
-      tiles[tileKey(x, y)] = EMPTY_TILE_VALUE;
+      tiles[tileKey(x, y)] = EMPTY;
     }
   }
   return tiles;
@@ -33,18 +33,26 @@ const initTiles = size => {
 const moveTiles = ({ direction, tiles, size }) => {
   const newTiles = { ...tiles };
 
+  let currentTileKey;
+  let aheadTileKey;
+
   if (direction === DIRECTIONS.UP) {
+    // loop all tiles
     for (let x = 0; x < size; x++) {
       for (let y = 0; y < size; y++) {
         if (y - 1 >= 0) {
-          if (
-            newTiles[tileKey(x, y - 1)] === EMPTY_TILE_VALUE &&
-            tiles[tileKey(x, y)] !== EMPTY_TILE_VALUE
-          ) {
+          currentTileKey = tileKey(x, y);
+          aheadTileKey = tileKey(x, y - 1);
+
+          if (tiles[currentTileKey] === EMPTY) {
+            continue;
+          }
+
+          if (newTiles[aheadTileKey] === EMPTY) {
             // todo: przesowac go dopoki nie ma przed sobą sciany lub innego klocka
             // todo: dodac jesli ma przed sobą innego klocka
-            newTiles[tileKey(x, y - 1)] = tiles[tileKey(x, y)];
-            newTiles[tileKey(x, y)] = EMPTY_TILE_VALUE;
+            newTiles[aheadTileKey] = tiles[currentTileKey];
+            newTiles[currentTileKey] = EMPTY;
           }
         }
       }
@@ -57,11 +65,11 @@ const moveTiles = ({ direction, tiles, size }) => {
       for (let y = size - 1; y >= 0; y--) {
         if (y + 1 <= size - 1) {
           if (
-            newTiles[tileKey(x, y + 1)] === EMPTY_TILE_VALUE &&
-            tiles[tileKey(x, y)] !== EMPTY_TILE_VALUE
+            newTiles[tileKey(x, y + 1)] === EMPTY &&
+            tiles[tileKey(x, y)] !== EMPTY
           ) {
             newTiles[tileKey(x, y + 1)] = tiles[tileKey(x, y)];
-            newTiles[tileKey(x, y)] = EMPTY_TILE_VALUE;
+            newTiles[tileKey(x, y)] = EMPTY;
           }
         }
       }
@@ -74,11 +82,11 @@ const moveTiles = ({ direction, tiles, size }) => {
       for (let y = 0; y < size; y++) {
         if (x + 1 <= size - 1) {
           if (
-            newTiles[tileKey(x + 1, y)] === EMPTY_TILE_VALUE &&
-            tiles[tileKey(x, y)] !== EMPTY_TILE_VALUE
+            newTiles[tileKey(x + 1, y)] === EMPTY &&
+            tiles[tileKey(x, y)] !== EMPTY
           ) {
             newTiles[tileKey(x + 1, y)] = tiles[tileKey(x, y)];
-            newTiles[tileKey(x, y)] = EMPTY_TILE_VALUE;
+            newTiles[tileKey(x, y)] = EMPTY;
           }
         }
       }
@@ -91,11 +99,11 @@ const moveTiles = ({ direction, tiles, size }) => {
       for (let y = 0; y < size; y++) {
         if (x - 1 >= 0) {
           if (
-            newTiles[tileKey(x - 1, y)] === EMPTY_TILE_VALUE &&
-            tiles[tileKey(x, y)] !== EMPTY_TILE_VALUE
+            newTiles[tileKey(x - 1, y)] === EMPTY &&
+            tiles[tileKey(x, y)] !== EMPTY
           ) {
             newTiles[tileKey(x - 1, y)] = tiles[tileKey(x, y)];
-            newTiles[tileKey(x, y)] = EMPTY_TILE_VALUE;
+            newTiles[tileKey(x, y)] = EMPTY;
           }
         }
       }
@@ -106,7 +114,7 @@ const moveTiles = ({ direction, tiles, size }) => {
   return tiles;
 };
 
-const tileValToStr = val => (val === EMPTY_TILE_VALUE ? "" : `${val}`);
+const tileValToStr = val => (val === EMPTY ? "" : `${val}`);
 const Tile = ({ val }) => <div className="tile">{tileValToStr(val)}</div>;
 
 const renderTiles = tiles =>
