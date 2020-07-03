@@ -23,6 +23,28 @@ const setVal = ({ tiles, x, y, key, val }) => ({
   [key || tileKey(x, y)]: val,
 });
 
+const getEmptyTilesKeys = (tiles, size) => {
+  const keys = [];
+
+  for (let x = 0; x < size; x++) {
+    for (let y = 0; y < size; y++) {
+      let key = tileKey(x, y);
+      if (tiles[key] === EMPTY) {
+        keys.push(key);
+      }
+    }
+  }
+
+  return keys;
+};
+
+export const addNewTile = (tiles, size) => {
+  const emptyTilesKeys = getEmptyTilesKeys(tiles, size);
+  const key = emptyTilesKeys[Math.floor(Math.random() * emptyTilesKeys.length)];
+  const val = Math.random() < 0.9 ? 2 : 4;
+  return setVal({ tiles, key, val });
+};
+
 export const initTiles = (size) => {
   let tiles = {};
   for (let x = 0; x < size; x++) {
@@ -31,14 +53,11 @@ export const initTiles = (size) => {
     }
   }
 
-  // return tiles;
+  // add 2 tiles to initial board
+  tiles = addNewTile(tiles, size);
+  tiles = addNewTile(tiles, size);
 
-  // TODO: testing code, remove later
-  let newTiles = setVal({ tiles, x: 0, y: 1, val: 2 });
-  newTiles = setVal({ tiles: newTiles, x: 1, y: 1, val: 4 });
-  newTiles = setVal({ tiles: newTiles, x: 2, y: 0, val: 2 });
-  newTiles = setVal({ tiles: newTiles, x: 2, y: 1, val: 8 });
-  return newTiles;
+  return tiles;
 };
 
 const moveTileIfNeeded = ({ newTiles, x, y, getAheadXY }) => {
@@ -150,26 +169,4 @@ export const moveTiles = ({ direction, tiles, size }) => {
   }
 
   return tiles;
-};
-
-const getEmptyTilesKeys = (tiles, size) => {
-  const keys = [];
-
-  for (let x = 0; x < size; x++) {
-    for (let y = 0; y < size; y++) {
-      let key = tileKey(x, y);
-      if (tiles[key] === EMPTY) {
-        keys.push(key);
-      }
-    }
-  }
-
-  return keys;
-};
-
-export const addNewTile = (tiles, size) => {
-  const emptyTilesKeys = getEmptyTilesKeys(tiles, size);
-  const key = emptyTilesKeys[Math.floor(Math.random() * emptyTilesKeys.length)];
-  const val = Math.random() < 0.9 ? 2 : 4;
-  return setVal({ tiles, key, val });
 };

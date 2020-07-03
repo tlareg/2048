@@ -3,3 +3,4 @@
 
 TODO:
 - should no add new tile if no tiles moved
+- add tiles colors

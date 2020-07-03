@@ -32,12 +32,17 @@ const Board = () => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      const direction = directionByKey[e.key];
+      if (!direction) return;
+
       let newTiles = moveTiles({
         tiles,
         size,
-        direction: directionByKey[e.key],
+        direction,
       });
+
       newTiles = addNewTile(newTiles, size);
+
       setTiles(newTiles);
     };
 
