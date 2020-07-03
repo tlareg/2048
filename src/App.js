@@ -11,7 +11,7 @@ import {
 } from "./core";
 
 const Tile = ({ val }) => (
-  <div className="tile">{val === EMPTY ? "" : `${val}`}</div>
+  <div className={`tile tile-${val}`}>{val === EMPTY ? "" : `${val}`}</div>
 );
 
 const Tiles = ({ tiles, size }) =>
@@ -66,7 +66,7 @@ const Board = () => {
 const App = () => {
   return (
     <div className="app">
-      <div>2048</div>
+      <h1>2048</h1>
       <Board />
     </div>
   );
