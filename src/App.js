@@ -6,28 +6,36 @@ const DIRECTIONS = {
   UP: "up",
   DOWN: "down",
   RIGHT: "right",
-  LEFT: "left"
+  LEFT: "left",
 };
 
 const directionByKey = {
   ArrowUp: DIRECTIONS.UP,
   ArrowDown: DIRECTIONS.DOWN,
   ArrowRight: DIRECTIONS.RIGHT,
-  ArrowLeft: DIRECTIONS.LEFT
+  ArrowLeft: DIRECTIONS.LEFT,
 };
 
 const tileKey = (x, y) => `x${x}y${y}`;
 
 const setVal = ({ tiles, x, y, val }) => ({ ...tiles, [tileKey(x, y)]: val });
 
-const initTiles = size => {
-  const tiles = {};
+const initTiles = (size) => {
+  let tiles = {};
   for (let x = 0; x < size; x++) {
     for (let y = 0; y < size; y++) {
-      tiles[tileKey(x, y)] = EMPTY;
+      tiles = setVal({ tiles, x, y, val: EMPTY });
     }
   }
-  return tiles;
+
+  // return tiles;
+
+  // TODO: testing code, remove later
+  let newTiles = setVal({ tiles, x: 0, y: 1, val: 2 });
+  newTiles = setVal({ tiles: newTiles, x: 1, y: 1, val: 4 });
+  newTiles = setVal({ tiles: newTiles, x: 2, y: 0, val: 2 });
+  newTiles = setVal({ tiles: newTiles, x: 2, y: 1, val: 8 });
+  return newTiles;
 };
 
 const moveTileIfNeeded = ({ newTiles, x, y, getAheadXY }) => {
@@ -42,7 +50,7 @@ const moveTileIfNeeded = ({ newTiles, x, y, getAheadXY }) => {
     newTiles = {
       ...newTiles,
       [aheadTileKey]: newTiles[currentTileKey],
-      [currentTileKey]: EMPTY
+      [currentTileKey]: EMPTY,
     };
 
     currentTileKey = aheadTileKey;
@@ -57,7 +65,7 @@ const moveTileIfNeeded = ({ newTiles, x, y, getAheadXY }) => {
     return {
       ...newTiles,
       [aheadTileKey]: newTiles[currentTileKey] + newTiles[aheadTileKey],
-      [currentTileKey]: EMPTY
+      [currentTileKey]: EMPTY,
     };
   }
 
@@ -76,7 +84,7 @@ const moveTiles = ({ direction, tiles, size }) => {
           newTiles,
           x,
           y,
-          getAheadXY: (x, y) => ({ x, y: y - 1 })
+          getAheadXY: (x, y) => ({ x, y: y - 1 }),
         });
       }
     }
@@ -92,7 +100,7 @@ const moveTiles = ({ direction, tiles, size }) => {
           newTiles,
           x,
           y,
-          getAheadXY: (x, y) => ({ x, y: y + 1 })
+          getAheadXY: (x, y) => ({ x, y: y + 1 }),
         });
       }
     }
@@ -108,7 +116,7 @@ const moveTiles = ({ direction, tiles, size }) => {
           newTiles,
           x,
           y,
-          getAheadXY: (x, y) => ({ x: x + 1, y })
+          getAheadXY: (x, y) => ({ x: x + 1, y }),
         });
       }
     }
@@ -124,7 +132,7 @@ const moveTiles = ({ direction, tiles, size }) => {
           newTiles,
           x,
           y,
-          getAheadXY: (x, y) => ({ x: x - 1, y })
+          getAheadXY: (x, y) => ({ x: x - 1, y }),
         });
       }
     }
@@ -134,10 +142,11 @@ const moveTiles = ({ direction, tiles, size }) => {
   return tiles;
 };
 
-const tileValToStr = val => (val === EMPTY ? "" : `${val}`);
-const Tile = ({ val }) => <div className="tile">{tileValToStr(val)}</div>;
+const Tile = ({ val }) => (
+  <div className="tile">{val === EMPTY ? "" : `${val}`}</div>
+);
 
-const renderTiles = tiles =>
+const Tiles = ({ tiles }) =>
   Array(BOARD_SIZE)
     .fill()
     .map((_v, y) => (
@@ -154,15 +163,7 @@ const Board = () => {
   const [tiles, setTiles] = useState(initTiles(BOARD_SIZE));
 
   useEffect(() => {
-    let newTiles = setVal({ tiles, x: 0, y: 1, val: 2 });
-    newTiles = setVal({ tiles: newTiles, x: 1, y: 1, val: 4 });
-    newTiles = setVal({ tiles: newTiles, x: 2, y: 0, val: 2 });
-    newTiles = setVal({ tiles: newTiles, x: 2, y: 1, val: 8 });
-    setTiles(newTiles);
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = e => {
+    const handleKeyDown = (e) => {
       setTiles(
         moveTiles({ tiles, size: BOARD_SIZE, direction: directionByKey[e.key] })
       );
@@ -170,9 +171,13 @@ const Board = () => {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [tiles, moveTiles, directionByKey]);
+  }, [tiles]);
 
-  return <div className="board">{renderTiles(tiles)}</div>;
+  return (
+    <div className="board">
+      <Tiles tiles={tiles} />
+    </div>
+  );
 };
 
 const App = () => {
