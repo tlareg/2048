@@ -18,7 +18,10 @@ export const directionByKey = {
 
 export const tileKey = (x, y) => `x${x}y${y}`;
 
-const setVal = ({ tiles, x, y, val }) => ({ ...tiles, [tileKey(x, y)]: val });
+const setVal = ({ tiles, x, y, key, val }) => ({
+  ...tiles,
+  [key || tileKey(x, y)]: val,
+});
 
 export const initTiles = (size) => {
   let tiles = {};
@@ -147,4 +150,26 @@ export const moveTiles = ({ direction, tiles, size }) => {
   }
 
   return tiles;
+};
+
+const getEmptyTilesKeys = (tiles, size) => {
+  const keys = [];
+
+  for (let x = 0; x < size; x++) {
+    for (let y = 0; y < size; y++) {
+      let key = tileKey(x, y);
+      if (tiles[key] === EMPTY) {
+        keys.push(key);
+      }
+    }
+  }
+
+  return keys;
+};
+
+export const addNewTile = (tiles, size) => {
+  const emptyTilesKeys = getEmptyTilesKeys(tiles, size);
+  const key = emptyTilesKeys[Math.floor(Math.random() * emptyTilesKeys.length)];
+  const val = Math.random() < 0.9 ? 2 : 4;
+  return setVal({ tiles, key, val });
 };

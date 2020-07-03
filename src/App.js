@@ -6,6 +6,7 @@ import {
   directionByKey,
   initTiles,
   moveTiles,
+  addNewTile,
 } from "./core";
 
 const Tile = ({ val }) => (
@@ -31,7 +32,13 @@ const Board = () => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      setTiles(moveTiles({ tiles, size, direction: directionByKey[e.key] }));
+      let newTiles = moveTiles({
+        tiles,
+        size,
+        direction: directionByKey[e.key],
+      });
+      newTiles = addNewTile(newTiles, size);
+      setTiles(newTiles);
     };
 
     document.addEventListener("keydown", handleKeyDown);
