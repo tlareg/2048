@@ -7,6 +7,7 @@ import {
   initTiles,
   moveTiles,
   addNewTile,
+  areTilesEqual,
 } from "./core";
 
 const Tile = ({ val }) => (
@@ -33,6 +34,8 @@ const Board = () => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       const direction = directionByKey[e.key];
+
+      // update only when direction keys pressed
       if (!direction) return;
 
       let newTiles = moveTiles({
@@ -41,7 +44,10 @@ const Board = () => {
         direction,
       });
 
-      newTiles = addNewTile(newTiles, size);
+      // should add new random tile only if tiles moved after user action
+      if (!areTilesEqual(tiles, newTiles, size)) {
+        newTiles = addNewTile(newTiles, size);
+      }
 
       setTiles(newTiles);
     };

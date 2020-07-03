@@ -23,6 +23,18 @@ const setVal = ({ tiles, x, y, key, val }) => ({
   [key || tileKey(x, y)]: val,
 });
 
+export const areTilesEqual = (tilesA, tilesB, size) => {
+  for (let x = 0; x < size; x++) {
+    for (let y = 0; y < size; y++) {
+      let key = tileKey(x, y);
+      if (tilesA[key] !== tilesB[key]) {
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
 const getEmptyTilesKeys = (tiles, size) => {
   const keys = [];
 
