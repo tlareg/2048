@@ -43,25 +43,34 @@ const moveTileIfNeeded = ({ newTiles, x, y, getAheadXY }) => {
   let { x: aheadX, y: aheadY } = getAheadXY(x, y);
   let aheadTileKey = tileKey(aheadX, aheadY);
 
+  // if tile is empty, we dont need to move it anywhere
   if (newTiles[currentTileKey] === EMPTY) return newTiles;
 
-  // move until it has wall or other not empty tile ahead
+  // if tile is not empty,
+  // move it while ahead tile is not board edge and empty
   while (newTiles[aheadTileKey] && newTiles[aheadTileKey] === EMPTY) {
+
+    // move tile ahead and clear current position
     newTiles = {
       ...newTiles,
       [aheadTileKey]: newTiles[currentTileKey],
       [currentTileKey]: EMPTY,
     };
 
+    // update current tile pointer
     currentTileKey = aheadTileKey;
+
+    // update ahead tile pointer
     const newAheadCoords = getAheadXY(aheadX, aheadY);
     aheadX = newAheadCoords.x;
     aheadY = newAheadCoords.y;
     aheadTileKey = tileKey(aheadX, aheadY);
   }
 
-  // sum tiles
+  // if next tile is not empty and tiles has same value, sum tiles
   if (newTiles[currentTileKey] === newTiles[aheadTileKey]) {
+
+    // save sum ahead and clear current position
     return {
       ...newTiles,
       [aheadTileKey]: newTiles[currentTileKey] + newTiles[aheadTileKey],
@@ -160,18 +169,17 @@ const Tiles = ({ tiles }) =>
     ));
 
 const Board = () => {
-  const [tiles, setTiles] = useState(initTiles(BOARD_SIZE));
+  const size = BOARD_SIZE;
+  const [tiles, setTiles] = useState(initTiles(size));
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      setTiles(
-        moveTiles({ tiles, size: BOARD_SIZE, direction: directionByKey[e.key] })
-      );
+      setTiles(moveTiles({ tiles, size, direction: directionByKey[e.key] }));
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [tiles]);
+  }, [tiles, size]);
 
   return (
     <div className="board">
